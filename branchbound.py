@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from mip import * #Pacote usado pra resolver modelos de programação linear
+from mip import * #Pacote usado pra resolver modelos de programaÃ§Ã£o linear
 from threading import * #Pacote usado para criar Thread
 from graphviz import Digraph #Pacote usado para criar a imagem da arvore dos nos
 
@@ -9,7 +9,7 @@ from graphviz import Digraph #Pacote usado para criar a imagem da arvore dos nos
 #E precisara sair dividindo o dominio para achar uma solucao inteira
 class node:
 
-  #Funcao de Iniciação
+  #Funcao de IniciaÃ§Ã£o
   #Parametros:
   # m-> Modelo associado ao no
   # valor_solucao -> Valor da solucao gerada pelo modelo
@@ -21,7 +21,7 @@ class node:
     self.left = None  # Armazena o no do filho a esquerda
     self.right = None  # Armazena o no do filho a direita
 
-  #Função para visualizar a arvore => Dado o no, a sub-arvore abaixo desse no
+  #FunÃ§Ã£o para visualizar a arvore => Dado o no, a sub-arvore abaixo desse no
   #Parametros:
   # graph -> Possivel variavel graph na qual sera criado a imagem do grafico
   def visualize_tree(self, graph=None):
@@ -30,39 +30,39 @@ class node:
         graph = Digraph() #Se nao foi, vamos criar uma do zero
 
       if self.variaveis is None:
-        return graph #Se o nó não tiver sub-arvore, so retorna
+        return graph #Se o nÃ³ nÃ£o tiver sub-arvore, so retorna
 
-      #Filtra as variáveis para mostrar apenas aquelas cujo valor seja > 0
+      #Filtra as variÃ¡veis para mostrar apenas aquelas cujo valor seja > 0
       variaveis_filtradas = [(v, valor) for v, valor in self.variaveis if valor != None and valor > 0]
 
-      #Cria o rótulo com o valor da solução e a lista filtrada de variáveis
+      #Cria o rÃ³tulo com o valor da soluÃ§Ã£o e a lista filtrada de variÃ¡veis
       label = f"{variaveis_filtradas}\nZ={self.valor_solucao}"
 
-      #Cria um identificador único para o nó usando o id do no
+      #Cria um identificador Ãºnico para o nÃ³ usando o id do no
       #Para criar uma arvore sem utilizar um no ja existente
       node_id = str(id(self))
 
-      # Adiciona o nó ao gráfico com o identificador único
+      # Adiciona o nÃ³ ao grÃ¡fico com o identificador Ãºnico
       graph.node(node_id, label=label)
 
-      # Se houver filho à esquerda, cria a conexão e faz a recursão
+      # Se houver filho Ã  esquerda, cria a conexÃ£o e faz a recursÃ£o
       if self.left is not None:
         if self.left.variaveis is not None:
-          left_node_id = str(id(self.left))  # Identificador único do filho à esquerda
+          left_node_id = str(id(self.left))  # Identificador Ãºnico do filho Ã  esquerda
           graph.edge(node_id, left_node_id)
           self.left.visualize_tree(graph)
 
-      # Se houver filho à direita, cria a conexão e faz a recursão
+      # Se houver filho Ã  direita, cria a conexÃ£o e faz a recursÃ£o
       if self.right is not None:
         if self.right.variaveis is not None:
-          right_node_id = str(id(self.right))  # Identificador único do filho à direita
+          right_node_id = str(id(self.right))  # Identificador Ãºnico do filho Ã  direita
           graph.edge(node_id, right_node_id)
           self.right.visualize_tree(graph)
 
       #Retorna o grafico parea onde foi chamado
       return graph
 
-#Resolve o modelo e retorna o status e os valores das variáveis
+#Resolve o modelo e retorna o status e os valores das variÃ¡veis
 def solve(model):
     status = model.optimize() #Resolve o modelo
 
@@ -95,7 +95,7 @@ def int_solucion_test(variaveis):
 #Parametros:
 # No -> No que vai guardar as informacoes da geracao do modelo
 def thread_modelagem(no,modelt):
-  #Pede para o modelo nao mandar informaçoes extra sobre como ele ta resolvendo
+  #Pede para o modelo nao mandar informaÃ§oes extra sobre como ele ta resolvendo
   modelt.verbose = 0
 
   #E pede para resolver
@@ -120,7 +120,7 @@ print() #Isso serve para separar no terminal e ficar organizado
 
 model = Model(sense=MAXIMIZE, solver_name=CBC) #Isso define que sera um problema de maximizacao
 
-#Agora, vamos ler o arquivo e salvar todas as informações iniciais do modelo
+#Agora, vamos ler o arquivo e salvar todas as informaÃ§Ãµes iniciais do modelo
 with open(input_file, 'r') as arquivo:
   linha = arquivo.readline() #Le a primeira linha
 
@@ -150,7 +150,8 @@ with open(input_file, 'r') as arquivo:
     model += xsum(coeficientes[i]*x[i] for i in range(n_variaveis)) <= coeficientes[n_variaveis]
 
 #Vamos criar algumas variaveis para poder encontrar a solucao inteira do modelo
-solve_node = [] #Lista que vai armazenar os nos que irao ser resolvidos agora
+solve_node = [] #Lista que vai armazenar os nos que irao ser resolvidos no momento atual do codigo
+new_nodes = [] #Lista que vai armazenar os nos que vao ser resolvido no proximo ciclo do codigo
 running_threads = [] #Lista que vai armazenar as threads que vao executar no momento
 solucao_inteira = float('-inf') #Variavel que vai armazenar o valor da solucao inteira
 variaveis_solucao_inteira = [] #Lista que vai armazenar as variaveis que geraram a solucao inteira
@@ -162,7 +163,7 @@ Raiz = node(model,0,None)
 solve_node.append(Raiz)
 
 #E cria uma thread para resolver o no.
-#Além de colocar essa Thread na lista de Threads para comecarem a ser executada
+#AlÃ©m de colocar essa Thread na lista de Threads para comecarem a ser executada
 running_threads.append(Thread(target=thread_modelagem,args=(Raiz,Raiz.model)))
 
 #E comeca um Loop que vai resolver todos nos possiveis ate chegar ao fim das possibilidades de ramificacao
@@ -206,6 +207,11 @@ while True:
         variaveis_solucao_inteira = n.variaveis
 
     else:
+
+      #Teste 3: No gerou uma soluÃ§Ã£o pior do que a melhor solucao inteira encontrada:
+      if n.valor_solucao <= solucao_inteira:
+        continue #Se isso aconteceu, nao tem por que esse no continuar se ramificando, pois sempre ira gerar solucao com valores menores
+
       #Se entrou aqui, quer dizer que o no nao gerou uma solucao inteira e vai precisar ser ramificado
       modelo = n.model
 
@@ -220,20 +226,31 @@ while True:
       n.left = node(model1,0,None)
       n.right = node(model2,0,None)
 
-      #Coloca esses 2 nos na lista de nos para serem resolvidos
-      solve_node.append(n.left)
-      solve_node.append(n.right)
-
+      #Coloca esses 2 nos na lista de nos que vao futuramente ser resolvido
+      new_nodes.append(n.left)
+      new_nodes.append(n.right)
+      
       #E cria uma Thread pra resolver cada no
       running_threads.append(Thread(target=thread_modelagem,args=(n.left,n.left.model)))
       running_threads.append(Thread(target=thread_modelagem,args=(n.right,n.right.model)))
+  
+  #Depois de todos os nos de agora, adiciona os futuros nos na lista de nos a ser resolvidos
+  solve_node.extend(new_nodes)
+  #E esvazia a lista de futuros nos
+  new_nodes.clear()
 
-#Logo apos o loop, mostra ao usuario o valor da solucao inteira
-print(f"A solucao Inteira encontrada = {solucao_inteira}")
-print("Gerado pelas variaveis")
-#E mostra as variaveis que geraram a solucao
-for v in variaveis_solucao_inteira:
-  print(f"{v[0]} = {v[1]:.2f}")
+#Depois do loop
+if solucao_inteira == float('-inf'):
+  #Se nao encontrou nenhuma solucao inteira, informa ao usuario
+  print("O modelo nao possui solucao inteira e, caso seja util a solucao nao inteira, olhe a imagem")
+  print("Se a imagem estiver vazia = Seu modelo da entrada, nao tem solucao possivel")
+else:
+  #Caso encontrou qualquer solucao inteira, mostra ao usuario a solucao otima atual
+  print(f"A solucao Inteira encontrada = {solucao_inteira}")
+  print("Gerado pelas variaveis")
+  #E mostra as variaveis que geraram a solucao
+  for v in variaveis_solucao_inteira:
+    print(f"{v[0]} = {v[1]:.2f}")
 
 #E salva em uma imagem (Com formato .png) a arvore dos nos que foram gerados
 graph = Raiz.visualize_tree()
