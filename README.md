@@ -1,6 +1,6 @@
 This project attempts to recreate the Branch and Bound method of linear programming, but only with models that have only binary variables in their compositions.
 
-How do I run the code? 
+How do I run the code? \n
     When running the code (with python branchbound.py), the user will be asked for the name of the file that contains the input data. Right after this answer, the code flow will happen normally and you will have the solution at the end
 
 This input file must be in the following form:
